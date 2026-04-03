@@ -35,7 +35,7 @@ template <typename T> class TStack {
 
   bool isEmpty() const { return topIndex == -1; }
 
-  bool isFull() const { 4 return topIndex == SIZE - 1; }
+  bool isFull() const { return topIndex == SIZE - 1; }
 
   int getSize() const { return topIndex + 1; }
 };

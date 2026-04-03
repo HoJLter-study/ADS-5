@@ -53,7 +53,7 @@ std::string infx2pstfx(const std::string &inf) { //(2-1)*(6+2)
         }
         operations.pop();
 
-      } else if (operations.isEmpty() || sym == '(' ||
+      } else if (operations.isEmpty() ||
                  getPrior(sym) > getPrior(operations.top())) {
         operations.push(sym);
       } else if (getPrior(sym) <= getPrior(operations.top())) {
