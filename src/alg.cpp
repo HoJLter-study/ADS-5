@@ -26,21 +26,37 @@ uint8_t getPrior(char oper) {
 	return prior[oper];
 }
 
+int calc(char oper, int x, int y) {
+	switch (oper) {
+	case '+':
+		return x + y;
+	case '-':
+		return x - y;
+	case '*':
+		return x * y;
+	case '/':
+		return x / y;
+	}
+}
 
-std::string infx2pstfx(const std::string& inf) { //(2-1)*(6+2)
+
+std::string infx2pstfx(const std::string& inf) { //(2-1)*(6+2)	
 	std::string output;
 	TStack<char> operations;
 	for (char sym : inf) {
 		if (isDigit(sym)) {
 			output += sym;
+			output += ' ';
 		}
 		else if (isOperator(sym)) {
 			if (sym == '(') operations.push(sym);
 			else if (sym == ')') {
 				while (!operations.isEmpty() && operations.top() != '(') {
 					output += operations.pop();
+					output += ' ';
 				}
 				operations.pop();
+				
 			}
 			else if (operations.isEmpty() || sym == '(' ||
 				getPrior(sym) > getPrior(operations.top())) {
@@ -51,8 +67,9 @@ std::string infx2pstfx(const std::string& inf) { //(2-1)*(6+2)
 					operations.top() != '(' &&
 					getPrior(sym) <= getPrior(operations.top())) {
 					output += operations.pop();
-				}
+					output += ' ';
 
+				}
 				operations.push(sym);
 			}
 
@@ -61,25 +78,24 @@ std::string infx2pstfx(const std::string& inf) { //(2-1)*(6+2)
 
 	while (!operations.isEmpty()) {
 		output += operations.pop();
+		output += ' ';
 	}
-
-	std::cout << output;
-	return std::string("");
+	output.pop_back();
+	return output;
 }
 
 int eval(const std::string& pref) {
-  
-  return 0;
-}
-
-
-int main() {
-	infx2pstfx("(2-1)*(6+2)");
-
-	try {
-
+	TStack<int> stack;
+	for (char sym : pref) {
+		if (isDigit(sym)) {
+			stack.push(sym - '0');
+		}
+		else if (isOperator(sym)) {
+			int y = stack.pop();
+			int x = stack.pop();
+			int res = calc(sym, x, y);
+			stack.push(res);
+		}
 	}
-	catch (const std::runtime_error& e) {
-		std::cout << e.what();
-	}
+	return stack.pop();
 }
