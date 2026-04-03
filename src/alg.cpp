@@ -1,101 +1,87 @@
 // Copyright 2025 NNTU-CS
-#include <string>
-#include <map>
-#include "tstack.h"
 #include <iostream>
-#include <string>
 #include <map>
+#include <string>
+#include "tstack.h"
 
-bool isDigit(char sym) {
-	return sym >= 48 && sym <= 57;
-}
+bool isDigit(char sym) { return sym >= 48 && sym <= 57; }
 
 bool isOperator(char sym) {
-	return sym == '+' || sym == '-' ||
-		sym == '*' || sym == '/' ||
-		sym == '(' || sym == ')';
+  return sym == '+' || sym == '-' || sym == '*' || sym == '/' || sym == '(' ||
+         sym == ')';
 }
 
 uint8_t getPrior(char oper) {
-	std::map<char, uint8_t> prior = { 
-		{'(', 0}, {')', 1},
-		{'+', 2}, {'-', 2},
-		{'*', 3}, {'/', 3},
-	};
+  std::map<char, uint8_t> prior = {
+      {'(', 0}, {')', 1}, {'+', 2}, {'-', 2}, {'*', 3}, {'/', 3},
+  };
 
-	return prior[oper];
+  return prior[oper];
 }
 
 int calc(char oper, int x, int y) {
-	switch (oper) {
-	case '+':
-		return x + y;
-	case '-':
-		return x - y;
-	case '*':
-		return x * y;
-	case '/':
-		return x / y;
-	}
+  switch (oper) {
+  case '+':
+    return x + y;
+  case '-':
+    return x - y;
+  case '*':
+    return x * y;
+  case '/':
+    return x / y;
+  }
 }
 
+std::string infx2pstfx(const std::string &inf) { //(2-1)*(6+2)
+  std::string output;
+  TStack<char> operations;
+  for (char sym : inf) {
+    if (isDigit(sym)) {
+      output += sym;
+      output += ' ';
+    } else if (isOperator(sym)) {
+        if (sym == '(') {
+        operations.push(sym);
+      } else if (sym == ')') {
+        while (!operations.isEmpty() && operations.top() != '(') {
+          output += operations.pop();
+          output += ' ';
+        }
+        operations.pop();
 
-std::string infx2pstfx(const std::string& inf) { //(2-1)*(6+2)	
-	std::string output;
-	TStack<char> operations;
-	for (char sym : inf) {
-		if (isDigit(sym)) {
-			output += sym;
-			output += ' ';
-		}
-		else if (isOperator(sym)) {
-			if (sym == '(') operations.push(sym);
-			else if (sym == ')') {
-				while (!operations.isEmpty() && operations.top() != '(') {
-					output += operations.pop();
-					output += ' ';
-				}
-				operations.pop();
-				
-			}
-			else if (operations.isEmpty() || sym == '(' ||
-				getPrior(sym) > getPrior(operations.top())) {
-				operations.push(sym);
-			}
-			else if (getPrior(sym) <= getPrior(operations.top())) {
-				while (!operations.isEmpty() &&
-					operations.top() != '(' &&
-					getPrior(sym) <= getPrior(operations.top())) {
-					output += operations.pop();
-					output += ' ';
+      } else if (operations.isEmpty() || sym == '(' ||
+                 getPrior(sym) > getPrior(operations.top())) {
+        operations.push(sym);
+      } else if (getPrior(sym) <= getPrior(operations.top())) {
+        while (!operations.isEmpty() && operations.top() != '(' &&
+               getPrior(sym) <= getPrior(operations.top())) {
+          output += operations.pop();
+          output += ' ';
+        }
+        operations.push(sym);
+      }
+    }
+  }
 
-				}
-				operations.push(sym);
-			}
-
-		}
-	}
-
-	while (!operations.isEmpty()) {
-		output += operations.pop();
-		output += ' ';
-	}
-	output.pop_back();
-	return output;
+  while (!operations.isEmpty()) {
+    output += operations.pop();
+    output += ' ';
+  }
+  output.pop_back();
+  return output;
 }
 
-int eval(const std::string& pref) {
-	TStack<int> stack;
-	for (char sym : pref) {
-		if (isDigit(sym)) {
-			stack.push(sym - '0');
-		}
-		else if (isOperator(sym)) {
-			int y = stack.pop();
-			int x = stack.pop();
-			int res = calc(sym, x, y);
-			stack.push(res);
-		}
-	}
-	return stack.pop();
+int eval(const std::string &pref) {
+  TStack<int> stack;
+  for (char sym : pref) {
+    if (isDigit(sym)) {
+      stack.push(sym - '0');
+    } else if (isOperator(sym)) {
+      int y = stack.pop();
+      int x = stack.pop();
+      int res = calc(sym, x, y);
+      stack.push(res);
+    }
+  }
+  return stack.pop();
 }
