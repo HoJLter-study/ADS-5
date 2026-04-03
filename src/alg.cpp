@@ -2,7 +2,9 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <cstdint>
 #include "tstack.h"
+
 
 bool isDigit(char sym) { return sym >= 48 && sym <= 57; }
 
@@ -29,6 +31,8 @@ int calc(char oper, int x, int y) {
     return x * y;
   case '/':
     return x / y;
+  default:
+    return 0;
   }
 }
 
